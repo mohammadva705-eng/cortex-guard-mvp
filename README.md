@@ -1,5 +1,7 @@
 # CORTEX-GUARD MVP v1
 
+![CORTEX-GUARD logo](assets/cortex-guard-logo.png)
+
 إضافة Chrome تجريبية لتحليل الصفحة الحالية بحثًا عن مؤشرات تصيّد ثابتة. تجمع الإضافة عنوان الصفحة والنص الظاهر فقط، وترسل طلب التحليل إلى backend محلي.
 
 ## الحالة
@@ -118,6 +120,7 @@ python backend/app/tests/demo_scenario.py
 
 ```text
 LICENSE                 ترخيص MIT
+assets/                 شعار المشروع بصيغ SVG وPNG
 backend/app/core/       الثوابت والإعدادات
 backend/app/schemas/    عقود البيانات
 backend/app/services/   مراحل التحليل المنفصلة
