@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CORTEX-GUARD</title>
+    <link rel="stylesheet" href="popup.css">
+    <script src="popup.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <img class="brand-mark" src="icons/icon48.png" alt="">
+      <div class="brand-copy">
+        <h1>CORTEX-GUARD</h1>
+        <p>تحليل الصفحة الحالية</p>
+      </div>
+      <span id="status" class="status" role="status">جاهز</span>
+    </header>
+
+    <main class="content">
+      <p id="instruction" class="instruction">لم يُحلل هذا التبويب بعد.</p>
+      <button id="analyze-button" class="analyze-button" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="10.8" cy="10.8" r="6.8"></circle>
+          <path d="m16 16 4.2 4.2"></path>
+        </svg>
+        <span>حلّل الصفحة الحالية</span>
+      </button>
+
+      <p id="error-message" class="error-message" role="alert" hidden></p>
+
+      <section id="result" class="result" aria-labelledby="result-title" hidden>
+        <div class="result-heading">
+          <div>
+            <h2 id="result-title">نتيجة التحليل</h2>
+            <p id="risk-label" class="risk-label"></p>
+          </div>
+          <div class="score-value">
+            <span id="risk-score">--</span>
+            <small>درجة الخطر</small>
+          </div>
+        </div>
+
+        <div class="score-track" role="progressbar" aria-label="درجة الخطر" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <span id="score-fill"></span>
+        </div>
+
+        <div class="context-row">
+          <span>سياق الجلسة</span>
+          <strong id="context-pattern">لا يوجد نمط متعدد الخطوات</strong>
+        </div>
+
+        <div class="evidence-section">
+          <h3>الأدلة</h3>
+          <ul id="evidence-list" class="evidence-list"></ul>
+          <p id="empty-evidence" class="empty-evidence" hidden>لم تُسجّل أدلة لهذه النتيجة.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="privacy-note">يُرسل عنوان الصفحة والنص الظاهر فقط إلى الخادم المحلي.</footer>
+  </body>
+</html>

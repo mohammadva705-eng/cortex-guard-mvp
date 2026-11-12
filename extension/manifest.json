@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "CORTEX-GUARD MVP",
   "version": "1.0.0",
-  "description": "Minimal page analysis extension for CORTEX-GUARD MVP.",
+  "description": "Analyze the current page and review its phishing risk.",
   "icons": {
     "16": "icons/icon16.png",
     "32": "icons/icon32.png",
@@ -32,7 +32,8 @@
     }
   ],
   "action": {
-    "default_title": "Analyze Current Page",
+    "default_title": "تحليل الصفحة الحالية",
+    "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/icon16.png",
       "32": "icons/icon32.png"

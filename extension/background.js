@@ -3,21 +3,60 @@ const MAX_CONTENT_LENGTH = 5000;
 const RISK_NOTIFICATION_THRESHOLD = 0.6;
 const REQUEST_TIMEOUT_MS = 2000;
 const RETRY_ATTEMPTS = 1;
+const DISPLAY_LABELS = {
+  safe: "آمن",
+  suspicious: "مريب",
+  phishing: "تصيّد",
+  critical_phishing: "تصيّد حرج"
+};
+const DISPLAY_PATTERNS = {
+  none: "لا يوجد نمط متعدد الخطوات",
+  multi_step_attack: "هجوم متعدد الخطوات"
+};
+const DISPLAY_EVIDENCE = {
+  "Urgency language detected": "تم رصد لغة استعجال",
+  "Suspicious URL detected": "تم رصد رابط مريب",
+  "OTP request detected": "تم رصد طلب رمز تحقق",
+  "Multi-step attack pattern matched": "تطابق نمط هجوم متعدد الخطوات"
+};
 
-chrome.action.onClicked.addListener(async (tab) => {
-  if (!tab || !tab.id) {
-    return;
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (!message || message.type !== "ANALYZE_ACTIVE_TAB") {
+    return false;
+  }
+
+  void analyzeTab(message.tabId).then(sendResponse, () => sendResponse(null));
+  return true;
+});
+
+async function analyzeTab(tabId) {
+  if (!Number.isInteger(tabId)) {
+    return null;
   }
 
   try {
-    const pageData = await collectPageData(tab.id);
-    const analysis = await sendToBackend(pageData, tab.id);
-
-    await updateNotificationState(analysis, tab.id);
+    await chrome.action.setBadgeText({ tabId, text: "" });
   } catch (_error) {
-    // Silent fail by specification.
+    // The popup still reports the analysis state if the badge cannot be cleared.
   }
-});
+
+  try {
+    const pageData = await collectPageData(tabId);
+    const analysis = await sendToBackend(pageData, tabId);
+
+    if (analysis) {
+      try {
+        await updateNotificationState(analysis, tabId);
+      } catch (_error) {
+        // A notification failure must not discard the analysis result.
+      }
+    }
+
+    return analysis;
+  } catch (_error) {
+    return null;
+  }
+}
 
 async function collectPageData(tabId) {
   try {
@@ -179,7 +218,7 @@ async function updateNotificationState(analysis, tabId) {
   });
   await chrome.action.setTitle({
     tabId,
-    title: `CORTEX-GUARD | ${scoreText} | ${analysis.label}`
+    title: `CORTEX-GUARD | ${scoreText} | ${DISPLAY_LABELS[analysis.label] || analysis.label}`
   });
 
   if (!isHighRisk) {
@@ -187,13 +226,15 @@ async function updateNotificationState(analysis, tabId) {
   }
 
   const evidence = Array.isArray(analysis.evidence_chain)
-    ? analysis.evidence_chain.join(" | ")
+    ? analysis.evidence_chain.map((item) => DISPLAY_EVIDENCE[item] || item).join(" | ")
     : "";
+  const label = DISPLAY_LABELS[analysis.label] || analysis.label;
+  const pattern = DISPLAY_PATTERNS[analysis.context_pattern] || analysis.context_pattern;
 
   await chrome.notifications.create(`cortex-guard-${tabId}-${Date.now()}`, {
     type: "basic",
     iconUrl: "icons/icon128.png",
-    title: `CORTEX-GUARD: ${analysis.label}`,
-    message: `Risk ${scoreText} | ${analysis.context_pattern}\n${evidence}`
+    title: `CORTEX-GUARD: ${label}`,
+    message: `الخطر ${scoreText} | ${pattern}\n${evidence}`
   });
 }
